@@ -1,0 +1,3 @@
+(executables
+ (names coin dice telephone sum_of_dice sum_of_two_dice gender_bias)
+ (libraries byoppl))
