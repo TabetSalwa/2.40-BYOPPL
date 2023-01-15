@@ -9,5 +9,6 @@
  (depends
   (dune (>= 2.9))
   (owl (>= 1.0))
+  (owl-base (>= 1.0))
  )
 )

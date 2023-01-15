@@ -14,6 +14,7 @@ type 'a prob_law = {
 type 'a distrib = {
     sample : unit -> 'a;
     pdf : 'a -> float;
+    logpdf : 'a -> float;
     mean : float;
     var : float;
     law : 'a prob_law option;
@@ -42,6 +43,7 @@ let bernoulli (p: float) : int distrib =
          |0 -> 1. -. p
          |1 -> p
          |_ -> 0. in
+       let logpdf x = Owl_maths.log (pdf x) in
        let mean = p in
        let var = p *. (1. -. p) in
        let law =
@@ -52,6 +54,7 @@ let bernoulli (p: float) : int distrib =
        {
          sample = sample;
          pdf = pdf;
+         logpdf = logpdf;
          mean = mean;
          var = var;
          law = law;
@@ -68,14 +71,19 @@ let binomial (p: float) (n: int) : int distrib =
       done;
       !k in
     let pdf k =
-      float_of_int (Owl_maths.combination n k) *. (( p ** (float_of_int k)) *. ((1. -. p) ** (float_of_int (n - k)))) in
-    
+      (float_of_int (Owl_maths.combination n k)) *. (( p ** (float_of_int k)) *. ((1. -. p) ** (float_of_int (n - k)))) in
+    (*
+      let logpdf k =
+      -. Owl_maths.log (float_of_int (Owl_maths.combination n k)) -. (float_of_int k) *. Owl_maths.log p -. (float_of_int (n-k)) *. Owl_maths.log (1. -. p) in
+     *)
+    let logpdf k = Owl_stats.binomial_logpdf k ~p ~n in
     let mean = (float_of_int n) *. p in
     let var = (float_of_int n) *. p *. (1. -. p) in
     let law = None in
     {
       sample = sample;
       pdf = pdf;
+      logpdf = logpdf;
       mean = mean;
       var = var;
       law = law;
@@ -88,12 +96,14 @@ let uniform (a: float) (b: float) : float distrib =
       (Random.float (b -. a)) +. a in
     let pdf x =
       if (x<=b && a<=x) then (1. /. (b -. a)) else 0. in
+    let logpdf x = Owl_maths.log (pdf x) in
     let mean = (a +. b /. 2.) in
     let var = ((b -. a) ** 2.) /. 12. in
     let law = None in
     {
       sample = sample;
       pdf = pdf;
+      logpdf = logpdf;
       mean = mean;
       var = var;
       law = law;
@@ -106,6 +116,7 @@ let uniform_discr (a: int) (b: int) : int distrib =
       (Random.int (b-a+1)) + a in
     let pdf x =
       if x<=b && a<=x then 1./.(float_of_int (b-a+1)) else 0. in
+    let logpdf x = Owl_maths.log (pdf x) in
     let mean = (float_of_int (a+b)) /. 2. in
     let var = (float_of_int ((b-a)*(b-a+2))) /. 12. in
     let law = Some
@@ -115,6 +126,7 @@ let uniform_discr (a: int) (b: int) : int distrib =
     {
       sample = sample;
       pdf = pdf;
+      logpdf = logpdf;
       mean = mean;
       var = var;
       law = law;
@@ -140,6 +152,7 @@ let discrete_support to_float (values : 'a array) (probs : float array) : 'a dis
       if values.(i) = x then s := !s +. probs.(i)
     done;
     !s in
+  let logpdf x = Owl_maths.log (pdf x) in
   let mean =
     let s = ref 0. in
     for i=0 to n-1 do
@@ -161,6 +174,7 @@ let discrete_support to_float (values : 'a array) (probs : float array) : 'a dis
   {
     sample = sample;
     pdf = pdf;
+    logpdf = logpdf;
     mean = mean;
     var = var;
     law = law;
@@ -176,12 +190,14 @@ let exponential (lambda: float) : float distrib =
     let p = Random.float 1. in
     (-1. /. lambda) *. (Float.log (1. -. p)) in
   let pdf x = lambda *. Float.exp (-. lambda *. x) in
+  let logpdf x = Owl_maths.log lambda -. lambda *. x in
   let mean = 1. /. lambda in
   let var = 1. /. (lambda *. lambda) in
   let law = None in
   {
     sample = sample;
     pdf = pdf;
+    logpdf = logpdf;
     mean = mean;
     var = var;
     law = law;
@@ -195,12 +211,14 @@ let normal (m: float) (s: float) : 'a distrib =
     let sample () = Owl_stats.gaussian_rvs ~mu:m ~sigma:s in
     let const = 1. /. (s *. Float.sqrt (2. *. Float.pi)) in
     let pdf x = const *. Float.exp (- 0.5 *. (((x -. m) /. s) ** 2.)) in
+    let logpdf x = Owl_maths.log (pdf x) in
     let mean = m in
     let var = s ** 2. in
     let law = None in
     {
       sample = sample;
       pdf = pdf;
+      logpdf = logpdf;
       mean = mean;
       var = var;
       law = law;
