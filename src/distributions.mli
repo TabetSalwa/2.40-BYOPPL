@@ -79,14 +79,21 @@ val uniform : float -> float -> float distrib
 (** {b Uniform} distribution, taking as arguments the bounds {m a} and {m b} and yielding
 - a sampling function
 - its probability density function with {m \mathbb{P}(X=x) = \frac{1}{b-a}}
-- its logaritmic probability mass function
+- its logaritmic probability density function
 - the mean {m \mathbb{E}(X) = \frac{a+b}{2}}
 - the variance {m Var(X)=\frac{(b-a)^{2}}{12}} *)
 
 val exponential : float -> float distrib
 (** The {b Exponential} distribution is the probability distribution of the time between events in a process in which events occur continuously and independently at a constant average rate. This function takes as argument the parameter {m \lambda} and yields
 - a sampling function
-- its probability density function with {m \mathbb{P}(X=x) = \lambda e^{-\lambda x}} *)  
+- its probability density function with {m \mathbb{P}(X=x) = \lambda e^{-\lambda x}} 
+- its logarithmic probability density function
+- the mean {m \mathbb{E}(X) = \frac{1}{\lambda}}
+- the variance {m Var(X) = \frac{1}{\lambda^{2}}}*)  
   
 val normal : float -> float -> float distrib
-                                  (** *)
+                                     (** {b Normal} distribution, taking as arguments the mean {m \mu} and the standard deviation {m \sigma}, and yielding
+- a sampling function using the [Owl_stats] dedicated function
+- its probability density function with {m \mathbb{P}(X=x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{- \frac{1}{2} \left(\frac{x-\mu}{\sigma}  \right)^{2} }}
+- the mean {m \mathbb{E}(X) = \mu}
+- the variance {m Var(X) = \sigma^{2}} *)
