@@ -1,5 +1,8 @@
 open Byoppl
 open Distributions
+let () =
+  Format.printf "@.Telephone: we infer the life expectancy (parameter lambda) of an exponential distribution of my telephones in years@.";
+   
 open Infer.Importance_sampling
 
 let telephone =

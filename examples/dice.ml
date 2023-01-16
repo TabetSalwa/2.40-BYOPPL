@@ -22,7 +22,8 @@ let () =
   Format.printf "@.-- Die, Basic Rejection Sampling with n=1000 --@.";
   let dist = infer (fun x -> x) die [| 1; 2; 3; 4; 5; 6 |] in
   let m, s = Distributions.stats dist in
-  Format.printf "Die bias, mean: %f std:%f@." m s
+  Format.printf "Die bias, mean: %f std:%f@." m s;
+  Format.printf "@.This method is very slow because of the unlikelihood of having the same array of observations@."
 
 
 

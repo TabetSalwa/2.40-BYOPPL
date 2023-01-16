@@ -1,6 +1,9 @@
 open Byoppl
 open Distributions   
 
+let _ =
+  Format.printf "@. Sum : we infer the sum of two dice given one is even@."
+   
 open Infer.Rejection_sampling
 
 let sum _ =

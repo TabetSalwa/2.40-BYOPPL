@@ -32,7 +32,8 @@ let () =
   Format.printf "@.-- Sum of two dice, Basic Rejection Sampling --@.";
   let dist = infer float_of_int sum [| 5; 9; 8; 9; 10; 6 |] in
   let m, s = Distributions.stats dist in
-  Format.printf "First die number, mean: %f std:%f@." m s
+  Format.printf "First die number, mean: %f std:%f@." m s;
+  Format.printf "@.This method is very slow because of the unlikelihood of having the same array of observations@."
  
 
 

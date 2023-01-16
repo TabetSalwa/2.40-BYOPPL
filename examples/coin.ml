@@ -1,12 +1,12 @@
 open Byoppl
 open Distributions
    
-(*let _ =
-  Format.printf "@.Coin : we infer the bias of the coin given the following array of observations [0; 1; 1; 0; 0; 0; 0; 0; 0; 0]@.";*)
+let _ =
+  Format.printf "@.Coin : we infer the bias of the coin given the following array of observations [0; 1; 1; 0; 0; 0; 0; 0; 0; 0]@."
    
 let _ =
   Format.printf "@.-- Coin, Basic Enumeration --@.";
-  Format.printf "This inference method doesn't work because the coin's bias follows a continuous distribution (uniform)@.";
+  Format.printf "This inference method doesn't work because the coin's bias follows a continuous distribution (uniform)@."
 
   
 open Infer.Rejection_sampling   
