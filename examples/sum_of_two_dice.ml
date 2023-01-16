@@ -15,4 +15,26 @@ let () =
   let dist = infer float_of_int sum [| |] in
   let m, s = Distributions.stats dist in
   Format.printf "Sum, mean: %f std:%f@." m s
-  
+
+open Cps.Enumeration
+
+let sum cont _prob _data =
+    sample
+      (fun _prob a ->
+        sample
+          (fun _prob b ->
+            assume
+              (fun _prob -> cont _prob (a+b))
+              _prob
+              (a mod 2 = 0 || b mod 2 = 0))
+          _prob
+          (uniform_discr 1 6))
+      _prob
+      (uniform_discr 1 6)
+
+let () =
+  Format.printf "@.-- Sum of two dice given one is even, CPS Enumeration --@.";
+  let dist = infer float_of_int sum () in
+  let m, s = Distributions.stats dist in
+  Format.printf "Sum of two dice given one is even, mean: %f std:%f@." m s;
+  print_discrete dist

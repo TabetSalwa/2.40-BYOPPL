@@ -30,7 +30,7 @@ let print_discrete distrib =
   |Some l ->
     let n = Array.length l.support in
     for i=0 to n-1 do
-      Printf.printf "Value : %f - Probability : %f\n" l.support.(i) l.probs.(i)
+      Printf.printf "Value : %d - Probability : %f\n" l.support.(i) l.probs.(i)
     done
   |None -> raise (Invalid_argument "Continuous distribution")
                   
