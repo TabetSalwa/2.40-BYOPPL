@@ -1,5 +1,9 @@
 open Byoppl
 open Distributions
+let () =
+  Format.printf "@.Sum of two dice: we infer the number obtained with the first die given the sum of the two dice @.";
+
+   
 open Infer.Enumeration
 
 let sum =

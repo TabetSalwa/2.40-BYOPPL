@@ -25,12 +25,21 @@ let draw distrib = distrib.sample ()
 let stats distrib = distrib.mean,Float.sqrt (distrib.var)
 
 
-let print_discrete distrib =
+let print_discrete_int distrib =
   match distrib.law with
   |Some l ->
     let n = Array.length l.support in
     for i=0 to n-1 do
       Printf.printf "Value : %d - Probability : %f\n" l.support.(i) l.probs.(i)
+    done
+  |None -> raise (Invalid_argument "Continuous distribution")
+
+let print_discrete_float distrib =
+  match distrib.law with
+  |Some l ->
+    let n = Array.length l.support in
+    for i=0 to n-1 do
+      Printf.printf "Value : %f - Probability : %f\n" l.support.(i) l.probs.(i)
     done
   |None -> raise (Invalid_argument "Continuous distribution")
                   
@@ -72,10 +81,6 @@ let binomial (p: float) (n: int) : int distrib =
       !k in
     let pdf k =
       (float_of_int (Owl_maths.combination n k)) *. (( p ** (float_of_int k)) *. ((1. -. p) ** (float_of_int (n - k)))) in
-    (*
-      let logpdf k =
-      -. Owl_maths.log (float_of_int (Owl_maths.combination n k)) -. (float_of_int k) *. Owl_maths.log p -. (float_of_int (n-k)) *. Owl_maths.log (1. -. p) in
-     *)
     let logpdf k = Owl_stats.binomial_logpdf k ~p ~n in
     let mean = (float_of_int n) *. p in
     let var = (float_of_int n) *. p *. (1. -. p) in
@@ -88,6 +93,30 @@ let binomial (p: float) (n: int) : int distrib =
       var = var;
       law = law;
     }
+
+let poisson (lambda: float) : int distrib =
+  let pdf k = ((lambda** float_of_int(k)) *. Float.exp(-.lambda)) /. (Owl_maths.fact k) in
+  let sample () =
+    let p = Random.float 1.0 in
+    let k = ref 0 in
+    let sum = ref 0. in
+    while p > !sum do
+      sum := !sum +. pdf (!k);
+      k := !k + 1
+    done;
+    !k-1 in
+  let logpdf k = Owl_maths.log (pdf k) in
+  let mean = lambda in
+  let var = lambda in
+  let law = None in
+  {
+    sample = sample;
+    pdf = pdf;
+    logpdf = logpdf;
+    mean = mean;
+    var = var;
+    law = law;
+  }    
 
 let uniform (a: float) (b: float) : float distrib =
   if b<=a then raise (Invalid_value b)

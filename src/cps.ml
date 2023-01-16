@@ -34,6 +34,15 @@ module Enumeration = struct
   let observe cont _prob d v =
     factor cont _prob (d.pdf v)
 
+  let observe_array =
+    let rec observe_array_rec cont _prob d a id =
+      let cont' =
+        if id+1 >= Array.length a
+        then cont
+        else fun _prob -> observe_array_rec cont _prob d a (id+1)
+      in observe cont' _prob d a.(id)
+    in fun cont _prob d a -> observe_array_rec cont _prob d a 0
+
   let exit _prob v =
     let values = v::_prob.values in
     let probs = !curr_prob::_prob.probs in
@@ -50,7 +59,7 @@ end
 module Rejection_sampling = struct
 
   type prob = Prob
-  type ('a,'b) model = (unit -> 'a option) -> prob -> 'b -> 'a option
+  type ('a,'b) model = (prob -> 'a option) -> prob -> 'b -> 'a option
 
   let sample cont _prob d =
     let a = draw d in
@@ -71,6 +80,15 @@ module Rejection_sampling = struct
 
   let exit _prob v =
     Some v
+
+  let observe_array =
+    let rec observe_array_rec cont _prob d a id =
+      let cont' =
+        if id+1 >= Array.length a
+        then cont
+        else fun _prob -> observe_array_rec cont _prob d a (id+1)
+      in observe cont' _prob d a.(id)
+    in fun cont _prob d a -> observe_array_rec cont _prob d a 0
 
   let rec exec model data =
     match model exit Prob data with
@@ -99,6 +117,15 @@ module Importance_sampling = struct
 
   let observe cont _prob d v =
     factor cont _prob (d.pdf v)
+
+  let observe_array =
+    let rec observe_array_rec cont _prob d a id =
+      let cont' =
+        if id+1 >= Array.length a
+        then cont
+        else fun _prob -> observe_array_rec cont _prob d a (id+1)
+      in observe cont' _prob d a.(id)
+    in fun cont _prob d a -> observe_array_rec cont _prob d a 0
 
   let exit _prob v =
     (v,_prob)

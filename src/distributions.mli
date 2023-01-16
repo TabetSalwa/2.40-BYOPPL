@@ -34,8 +34,10 @@ val stats : 'a distrib -> (float * float)
 (** gives the mean and the standard deviation of the distribution given as argument*)
 
 (** {1 Printing functions} *)
-
-val print_discrete : float distrib -> unit
+val print_discrete_int : int distrib -> unit
+(** prints on the screen the probability for each value of a discrete distribution*)
+  
+val print_discrete_float : float distrib -> unit
 (** prints on the screen the probability for each value of a discrete distribution*)
                             
 (** {1 Distributions} *)
@@ -59,6 +61,13 @@ val binomial : float -> int -> int distrib
 - the mean {m \mathbb{E}(X=k) = np}
 - the variance {m Var(X=k) = np \times (1-p)}
 - and no law even if discrete because of the possibility of having a very large array *)
+
+val poisson : float -> int distrib
+(** {b Poisson} distribution, taking as argument a parameter {m \lambda} and yielding
+- a sampling function
+- its probability mass function with 
+- its logarithmic probability mass function 
+*)
 
 val uniform_discr : int -> int -> int distrib
 (** {b Uniform} distribution on a discrete support, taking as arguments the bounds {m a} and {m b} and yielding
@@ -92,7 +101,7 @@ val exponential : float -> float distrib
 - the variance {m Var(X) = \frac{1}{\lambda^{2}}}*)  
   
 val normal : float -> float -> float distrib
-                                     (** {b Normal} distribution, taking as arguments the mean {m \mu} and the standard deviation {m \sigma}, and yielding
+(** {b Normal} distribution, taking as arguments the mean {m \mu} and the standard deviation {m \sigma}, and yielding
 - a sampling function using the [Owl_stats] dedicated function
 - its probability density function with {m \mathbb{P}(X=x) = \frac{1}{\sigma \sqrt{2 \pi}} e^{- \frac{1}{2} \left(\frac{x-\mu}{\sigma}  \right)^{2} }}
 - the mean {m \mathbb{E}(X) = \mu}

@@ -1,5 +1,14 @@
 open Byoppl
-open Distributions   
+open Distributions
+let _ =
+  Format.printf "@.Die : we infer the die's bias given an array of observations [| 1; 2; 3; 4; 5; 6|]@."
+   
+let _ =
+  Format.printf "@.-- Die, Basic Enumeration --@.";
+  Format.printf "This inference method doesn't work because the die's bias follows a continuous distribution (uniform)@."
+
+
+   
 open Infer.Rejection_sampling
 
 let die =

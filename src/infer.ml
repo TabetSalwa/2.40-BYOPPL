@@ -8,11 +8,8 @@ module Enumeration = struct
   exception Continuous_model
   
   let sample d = Distributions.draw d
-
   let factor score s = score +. s 
-
   let assume score c = factor score (if c then 0. else infinity)
-                    
   let observe prob d v =
     factor prob (-. (d.Distributions.logpdf v))
 
@@ -50,9 +47,7 @@ module Rejection_sampling = struct
       
   exception Reject
   let sample d = Distributions.draw d
-
   let assume c = if not c then raise Reject
-
   let observe d v  = 
     let y = sample d in
     assume (y = v)
