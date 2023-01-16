@@ -40,7 +40,7 @@ let () =
   
 open Cps.Enumeration
 
-let sum cont _prob _data =
+let sum cont _prob () =
     sample
       (fun _prob a ->
         sample
