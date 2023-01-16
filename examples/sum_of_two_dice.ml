@@ -38,3 +38,49 @@ let () =
   let m, s = Distributions.stats dist in
   Format.printf "Sum of two dice given one is even, mean: %f std:%f@." m s;
   print_discrete dist
+
+open Cps.Rejection_sampling
+
+let sum cont _prob _data =
+    sample
+      (fun _prob a ->
+        sample
+          (fun _prob b ->
+            assume
+              (fun _prob -> cont _prob (a+b))
+              _prob
+              (a mod 2 = 0 || b mod 2 = 0))
+          _prob
+          (uniform_discr 1 6))
+      _prob
+      (uniform_discr 1 6)
+
+let () =
+  Format.printf "@.-- Sum of two dice given one is even, CPS Rejection sampling --@.";
+  let dist = infer float_of_int sum () in
+  let m, s = Distributions.stats dist in
+  Format.printf "Sum of two dice given one is even, mean: %f std:%f@." m s;
+  print_discrete dist
+
+open Cps.Importance_sampling
+
+let sum cont _prob _data =
+    sample
+      (fun _prob a ->
+        sample
+          (fun _prob b ->
+            assume
+              (fun _prob -> cont _prob (a+b))
+              _prob
+              (a mod 2 = 0 || b mod 2 = 0))
+          _prob
+          (uniform_discr 1 6))
+      _prob
+      (uniform_discr 1 6)
+
+let () =
+  Format.printf "@.-- Sum of two dice given one is even, CPS Importance sampling --@.";
+  let dist = infer float_of_int sum () in
+  let m, s = Distributions.stats dist in
+  Format.printf "Sum of two dice given one is even, mean: %f std:%f@." m s;
+  print_discrete dist

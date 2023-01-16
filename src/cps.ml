@@ -39,23 +39,71 @@ module Enumeration = struct
     let probs = !curr_prob::_prob.probs in
     run_next {values = values ; probs = probs ; futures = _prob.futures}
 
-  let model cont _prob _data =
-    sample
-      (fun _prob a ->
-        sample
-          (fun _prob b ->
-            assume
-              (fun _prob -> cont _prob (a+b))
-              _prob
-              (a mod 2 = 0 || b mod 2 = 0))
-          _prob
-          (uniform_discr 1 6))
-      _prob
-      (uniform_discr 1 6)
-
   let infer to_float model data =
     let () = curr_prob := 1. in
     let _prob = {values = [] ; probs = [] ; futures = Queue.create ()} in
     let _prob = model exit _prob data in
-    discrete_support to_float (Array.of_list _prob.values) (Array.of_list _prob.probs)
+    discrete_support to_float (Array.of_list _prob.values) (normalize (Array.of_list _prob.probs))
+end
+
+
+module Rejection_sampling = struct
+
+  type prob = Prob
+  type ('a,'b) model = (unit -> 'a option) -> prob -> 'b -> 'a option
+
+  let sample cont _prob d =
+    let a = draw d in
+    cont _prob a
+
+  let assume cont _prob c =
+    if c then cont _prob else None
+
+  let observe cont _prob d v =
+    sample
+      (fun _prob a ->
+        assume
+          cont
+          _prob
+          (a = v))
+      _prob
+      d
+
+  let exit _prob v =
+    Some v
+
+  let rec exec model data =
+    match model exit Prob data with
+    |Some v -> v
+    |None -> exec model data
+
+  let infer ?(n=1000) to_float model data =
+    let values = Array.init n (fun _ -> exec model data) in
+    uniform_support to_float values
+end
+
+
+module Importance_sampling = struct
+
+  type ('a,'b) model = (float -> float) -> float -> 'b -> 'a * float
+
+  let sample cont _prob d =
+    let a = draw d in
+    cont _prob a
+
+  let factor cont _prob p =
+    cont (_prob *. p)
+
+  let assume cont _prob c =
+    factor cont _prob (if c then 1. else 0.)
+
+  let observe cont _prob d v =
+    factor cont _prob (d.pdf v)
+
+  let exit _prob v =
+    (v,_prob)
+
+  let infer ?(n=1000) to_float model data =
+    let values,probs = Array.split (Array.init n (fun _ -> model exit 1. data)) in
+    discrete_support to_float values (normalize probs)
 end

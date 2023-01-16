@@ -41,7 +41,7 @@ module Enumeration = struct
         [||],[||]
       with Invalid_argument _ -> Array.of_list (List.rev !values), Array.of_list (List.rev !logprobs)
     in
-    discrete_support to_float values (Utils.normalize logprobs)
+    discrete_support to_float values (Utils.normalize_log logprobs)
 end
    
 module Rejection_sampling = struct
@@ -94,5 +94,5 @@ module Importance_sampling = struct
     let a = Array.init n (fun _ -> _model data) in
     let support = Array.init n (fun i -> fst (Array.get a i)) in
     let logprobs = Array.init n (fun i -> snd (Array.get a i)) in
-    Distributions.discrete_support to_float support (Utils.normalize logprobs)
+    Distributions.discrete_support to_float support (Utils.normalize_log logprobs)
 end

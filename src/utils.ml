@@ -24,7 +24,11 @@ let agglomerate values probs =
   let values,probs = Array.fold_left2 (fun (l1,l2) v p -> add_value v p l1 l2) ([],[]) values probs in
   Array.of_list values,Array.of_list probs
 
-let normalize logprobs =
+let normalize probs =
+  let sum = Array.fold_left (fun s p -> s +. p) 0. probs in
+  Array.map (fun p -> p /. sum) probs
+
+let normalize_log logprobs =
   let n = Array.length logprobs in
   let logmean = ref 0. in
   let nb_cool = ref 0 in
